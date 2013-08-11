@@ -20,17 +20,12 @@ endif
 
 " specify syntax types to skip
 if !exists("g:movealong_skip_syntax")
-  let g:movealong_skip_syntax = [ 'Comment', 'Noise' ]
-endif
-
-" skip noise after moving
-if !exists("g:movealong_skip_noise")
-  let g:movealong_skip_noise = 1
+  let g:movealong_skip_syntax = [ 'Comment', 'Noise', 'Special' ]
 endif
 
 " specify syntax types to be considered noise
 if !exists("g:movealong_noise_syntax")
-  let g:movealong_skip_syntax = [ 'Noise', 'Statement' ]
+  let g:movealong_noise_syntax = [ 'Noise', 'Special', 'Statement', 'PreProc' ]
 endif
 
 " specify words to skip
@@ -45,15 +40,18 @@ if !exists("g:movealong_skip_words")
     \ 'endfor',
     \ 'endwhile',
     \ 'endfunction',
-    \ '} else {'
+    \ '} else {',
   \ ]
 endif
 
 " set up commands
-command! -nargs=+ MovealongSyntax call movealong#syntax(<f-args>)
-command! -nargs=+ MovealongExpression call movealong#expression(<f-args>)
+command! -nargs=1 MovealongSyntax call movealong#syntax(<f-args>, {})
+command! -nargs=1 MovealongSyntaxWithinLine call movealong#syntax(<f-args>, { 'within_line' : 1 })
+command! -nargs=+ MovealongExpression call movealong#expression(<f-args>, {})
 
 " set up default maps
+nnoremap <silent> <Plug>movealongForward  :MovealongSyntax W<CR>
+nnoremap <silent> <Plug>movealongBackward :MovealongSyntax B<CR>
 nnoremap <silent> <Plug>movealongDown :MovealongSyntax zoj^<CR>
 nnoremap <silent> <Plug>movealongUp   :MovealongSyntax zok^<CR>
 
@@ -62,6 +60,10 @@ nnoremap <silent><expr> <Plug>movealongColumnUp   ":MovealongExpression zok^ ind
 
 " map default keys
 if g:movealong_default_keys
+  " Space and Shift+Space - move to next/previous useful word
+  nmap <silent> <Space>   <Plug>movealongForward
+  nmap <silent> <S-Space> <Plug>movealongBackward
+
   " Tab and Shift+Tab - move to next/previous useful line
   nmap <silent> <Tab>   <Plug>movealongDown
   nmap <silent> <S-Tab> <Plug>movealongUp
