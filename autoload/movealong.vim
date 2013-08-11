@@ -4,19 +4,23 @@
 " License:      Same as Vim itself.  See :help license
 
 " skip over any noise
-function! movealong#noise()
-  return movealong#syntax('w', { 'within_line' : 1, 'syntax' : [], 'skip_syntax' : g:movealong_noise_syntax })
+function! movealong#noise(skip_syntax)
+  return movealong#syntax('w', { 'inline' : 1, 'syntax' : [], 'skip_syntax' : a:skip_syntax })
 endfunction
 
 "  repeat a motion until encountering a given syntax type
 function! movealong#syntax(movement, options)
   let l:options = extend({
-    \ 'within_line'  : 0,
-    \ 'syntax'       : g:movealong_syntax,
-    \ 'skip_syntax'  : g:movealong_skip_syntax,
-    \ 'skip_words'   : g:movealong_skip_words,
+    \ 'inline'      : 0,
+    \ 'syntax'      : g:movealong_syntax,
+    \ 'skip_punct'  : g:movealong_skip_punct,
+    \ 'skip_words'  : g:movealong_skip_words,
   \ }, a:options)
     
+  let l:options = extend(l:options, {
+    \ 'skip_syntax' : l:options['inline'] ? g:movealong_skip_syntax_inline : g:movealong_skip_syntax
+  \ })
+
   let l:word = ''
   let l:line_text = ''
   let l:word_syntax = ''
@@ -36,13 +40,18 @@ function! movealong#syntax(movement, options)
       break
     endif
 
-    let l:word = expand('<cword>')
+    "let l:word = expand('<cword>')
+    normal "-yiw
+    let l:word = getreg('-')
     let l:line_text = substitute(getline('.'), ' ', '', 'g')
 
     if match(l:line_text, '[^ \t]') == -1
       " skip blank lines
       continue
-    elseif !empty(l:options['skip_words']) && index(l:options['skip_words'], l:line_text) > -1
+    elseif l:options['skip_punct'] && match(l:options['inline'] ? l:word : l:line_text, '\v^[[:punct:]]+$') > -1
+      " skip punctuation
+      continue
+    elseif !empty(l:options['skip_words']) && index(l:options['skip_words'], l:options['inline'] ? l:word : l:line_text) > -1
       " skip lines that only consist of an ignored word
       continue
     endif
@@ -62,8 +71,9 @@ function! movealong#syntax(movement, options)
     endif
 
     " skip ignored syntax types
+    "if !empty(l:options['skip_syntax']) && index(l:options['skip_syntax'], l:word_syntax) > -1
     if !empty(l:options['skip_syntax']) && index(l:options['skip_syntax'], l:word_syntax) > -1
-      if l:word_syntax == 'Comment' || l:line_text == l:word || l:options['within_line']
+      if l:word_syntax == 'Comment' || l:line_text == l:word || l:options['inline']
         continue
       endif
     endif
@@ -72,15 +82,16 @@ function! movealong#syntax(movement, options)
   endwhile
 
   " skip noise
-  if !l:options['within_line'] && l:line_text != l:word && index(g:movealong_noise_syntax, l:word_syntax) > -1
-    return movealong#noise()
+  if !l:options['inline'] && l:line_text != l:word && (index(l:options['skip_syntax'], l:word_syntax) > -1 || match(l:line_text, '\v^\s*[[:punct:]]') > -1)
+    return movealong#noise(l:options['skip_syntax'])
   endif
 endfunction
 
 " repeat a motion until the given expression returns true
 function! movealong#expression(movement, expression, options)
   let l:options = extend({
-    \ 'within_line' : 0,
+    \ 'inline'      : 0,
+    \ 'skip_syntax' : g:movealong_skip_syntax,
   \ }, a:options)
 
   " add current position to jumplist
@@ -101,7 +112,7 @@ function! movealong#expression(movement, expression, options)
   endwhile
 
   " skip noise
-  if !l:options['within_line']
-    return movealong#noise()
+  if !l:options['inline']
+    return movealong#noise(l:options['skip_syntax'])
   endif
 endfunction
