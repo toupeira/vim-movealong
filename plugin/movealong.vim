@@ -18,14 +18,29 @@ if !exists("g:movealong_syntax")
   let g:movealong_syntax = []
 endif
 
-" specify syntax types to skip
-if !exists("g:movealong_skip_syntax")
-  let g:movealong_skip_syntax = [ 'Noise', 'Comment', 'Statement', 'PreProc' ]
+" limit number of motions
+if !exists("g:movealong_max_motions")
+  let g:movealong_max_motions = 1000
 endif
 
-" specify syntax types to skip on inline movement
+" specify if lines should be crossed by default
+if !exists("g:movealong_cross_lines")
+  let g:movealong_cross_lines = 1
+endif
+
+" specify syntax types to skip
+if !exists("g:movealong_skip_syntax")
+  let g:movealong_skip_syntax = [ 'Noise', 'Comment', 'Statement', 'cInclude', 'rubyInclude', 'rubyDefine' ]
+endif
+
+" specify syntax types to skip on inline motions
 if !exists("g:movealong_skip_syntax_inline")
   let g:movealong_skip_syntax_inline = [ 'Noise', 'Comment' ]
+endif
+
+" skip noise after a successful movement
+if !exists("g:movealong_skip_noise")
+  let g:movealong_skip_noise = 0
 endif
 
 " skip punctuation
@@ -49,16 +64,20 @@ if !exists("g:movealong_skip_words")
 endif
 
 " set up commands
-command! -nargs=1 MovealongSyntax       call movealong#syntax(<f-args>, {})
-command! -nargs=1 MovealongSyntaxInline call movealong#syntax(<f-args>, { 'inline' : 1 })
-command! -nargs=+ MovealongExpression   call movealong#expression(<f-args>, {})
+command! -nargs=+ -complete=syntax     MovealongSyntax       call movealong#syntax(<f-args>)
+command! -nargs=+ -complete=syntax     MovealongSyntaxInline call movealong#syntax(<f-args>, { 'inline' : 1 })
+command! -nargs=0                      MovealongNoise        call movealong#syntax#noise()
+
+command! -nargs=+ -complete=expression MovealongExpression   call movealong#expression(<f-args>)
+
+command! -nargs=0                      MovealongWhatsWrong   call movealong#whatswrong()
 
 " set up default maps
 nnoremap <silent> <Plug>movealongForward  :MovealongSyntaxInline w<CR>
 nnoremap <silent> <Plug>movealongBackward :MovealongSyntaxInline b<CR>
 
-nnoremap <silent> <Plug>movealongDown     :MovealongSyntax zoj^<CR>
-nnoremap <silent> <Plug>movealongUp       :MovealongSyntax zok^<CR>
+nnoremap <silent> <Plug>movealongDown     :call movealong#syntax('zoj^', { 'skip_noise' : 1 })<CR>
+nnoremap <silent> <Plug>movealongUp       :call movealong#syntax('zok^', { 'skip_noise' : 1 })<CR>
 
 nnoremap <silent><expr> <Plug>movealongColumnDown ":MovealongExpression zoj^ indent('.')==" . indent('.') . "<CR>"
 nnoremap <silent><expr> <Plug>movealongColumnUp   ":MovealongExpression zok^ indent('.')==" . indent('.') . "<CR>"
