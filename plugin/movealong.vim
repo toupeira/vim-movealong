@@ -10,7 +10,7 @@ let g:loaded_movealong = 1
 
 " map default keys
 if !exists("g:movealong_default_keys")
-  let g:movealong_default_keys = 1
+  let g:movealong_default_keys = 0
 endif
 
 " limit number of motions
