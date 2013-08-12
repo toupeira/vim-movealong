@@ -1,4 +1,4 @@
-*movealong.txt*  Intelligently repeat motion commands
+*movealong.txt*  Context-aware motion commands
 
 Author:  Markus Koller <http://github.com/toupeira/>
 Version: 1.0
@@ -15,55 +15,57 @@ Commands           |movealong-commands|
 Functions          |movealong-functions|
 
 ------------------------------------------------------------------------------
-INTRODUCTION                                    *movealong*
+INTRODUCTION                                    *movealong-introduction*
 
-This plugin provides commands to repeat a motion (or any sequence of commands,
-really) until a condition has been met, for example a certain syntax group has
-been encountered, or an expression returns true.
+This plugin gives you commands to repeat a motion until either a specific
+syntax group is encountered, or an arbitrary expression returns true.
+It also skips over blank lines, punctuation and other syntax noise.
+
+The provided default keymaps use Tab / Shift+Tab to move around lines,
+and Space / Shift+Space to move around words. Since this is pretty intrusive
+these mappings are disabled by default, enable them by putting the following
+into your .vimrc: >
+
+  let g:movealong_default_keys = 1
+<
 
 ------------------------------------------------------------------------------
 MAPPINGS                                        *movealong-mappings*
 
 Normal mode mappings:
 
-<Plug>movealongForward
+<Space>                                         *movealong-<Space>*
         Move forward by word, skipping ignored syntax groups.
 
-<Plug>movealongBackward
+<S-Space>                                       *movealong-<S-Space>*
         Move backward by word, skipping ignored syntax groups.
 
-<Plug>movealongDown
-        Move down by line, skipping ignored syntax groups and syntax noise at
-        the beginning of the line.
+<Tab>                                           *movealong-<Tab>*
+        Move down by line, skipping ignored syntax groups, and any
+        syntax noise at the beginning of the matched line.
 
-<Plug>movealongUp
-        Move up by line, skipping ignored syntax groups and syntax noise at
-        the beginning of the line.
+<S-Tab>                                         *movealong-<S-Tab>*
+        Move up by line, skipping ignored syntax groups, and any
+        syntax noise at the beginning of the matched line.
 
-<Plug>movealongIndentDown
-        Move to the next line with the same indent as the current line.
+<C-Tab>                                         *movealong-<C-Tab>*
+        Move to the next line with the same indent as the current line,
+        and place the cursor at the beginning of the text.
 
-<Plug>movealongIndentUp
+<C-S-Tab>                                       *movealong-<C-S-Tab>*
         Move to the previous line with the same indent as the current line.
+        and place the cursor at the beginning of the text.
 
 ------------------------------------------------------------------------------
 CONFIGURATION                                   *movealong-configuration*
 
 g:movealong_default_keys                        *g:movealong_default_keys*
-        Enable default keymaps for normal mode:
+        Enable default keymaps for normal mode (see |movealong-mappings|).
 
-          <Space>    <Plug>movealongForward
-          <S-Space>  <Plug>movealongBackward
+        The default value is 0.
 
-          <Tab>      <Plug>movealongForward
-          <S-Tab>    <Plug>movealongBackward
-
-          <C-Tab>    <Plug>movealongForward
-          <c-S-Tab>  <Plug>movealongBackward
-
-        The default value is 1.
-
-The following variables can also be overriden with buffer-level variables:
+The following variables can also be overriden with buffer-level variables
+for filetype-specific configuration:
 
 g:movealong_max_motions                         *g:movealong_max_motions*
         Set an upper limit for how many times the motion will be repeated,
@@ -71,44 +73,15 @@ g:movealong_max_motions                         *g:movealong_max_motions*
 
         The default value is 1000.
 
-g:movealong_cross_lines                         *g:movealong_cross_lines*
-        Specify if a motion can cross lines, otherwise the command will be
-        aborted.
-
-        The default value is 1.
-
-g:movealong_syntax                              *g:movealong_syntax*
-        Specify syntax groups to look for, if it's empty any syntax group will
-        be accepted.
-
-        The default value is [].
-
 g:movealong_skip_syntax                         *g:movealong_skip_syntax*
-        Specify syntax groups to skip over.
+        Syntax groups that should be skipped by default.
 
         The default value is [ 'Noise', 'Comment', 'Statement', 'cInclude', 'rubyInclude', 'rubyDefine' ].
 
-g:movealong_skip_syntax_inline                  *g:movealong_skip_syntax_inline*
-        Specify syntax groups to skip over for inline motions.
-
-        The default value is [ 'Noise', 'Comment' ].
-
-g:movealong_skip_noise                          *g:movealong_skip_noise*
-        Specify if syntax noise should be skipped over after a successful
-        motion.
-
-        The default value is 0.
-
-g:movealong_skip_punct                          *g:movealong_skip_punct*
-        Specify if punctuation should be skipped over after a succesful
-        motion.
-
-        The default value is 1.
-
 g:movealong_skip_words                          *g:movealong_skip_words*
-        Specify words to skip over if they stand alone on a line.
+        Words that should be skipped by default.
 
-        The default value is a list of common words that end a block, see
+        The default value is a list of common tokens that end a block, see
         plugin/movealong.vim for details.
 
 ------------------------------------------------------------------------------
