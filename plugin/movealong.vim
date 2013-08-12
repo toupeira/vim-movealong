@@ -1,5 +1,5 @@
 " movealong.vim - Move along, nothing to see here.
-" Author:       Markus Koller
+" Author:       Markus Koller <http://github.com/toupeira/>
 " Version:      1.0
 " License:      Same as Vim itself.  See :help license
 
@@ -13,11 +13,6 @@ if !exists("g:movealong_default_keys")
   let g:movealong_default_keys = 1
 endif
 
-" specify syntax types to look for
-if !exists("g:movealong_syntax")
-  let g:movealong_syntax = []
-endif
-
 " limit number of motions
 if !exists("g:movealong_max_motions")
   let g:movealong_max_motions = 1000
@@ -26,6 +21,11 @@ endif
 " specify if lines should be crossed by default
 if !exists("g:movealong_cross_lines")
   let g:movealong_cross_lines = 1
+endif
+
+" specify syntax types to look for
+if !exists("g:movealong_syntax")
+  let g:movealong_syntax = []
 endif
 
 " specify syntax types to skip
@@ -79,8 +79,8 @@ nnoremap <silent> <Plug>movealongBackward :MovealongSyntaxInline b<CR>
 nnoremap <silent> <Plug>movealongDown     :call movealong#syntax('zoj^', { 'skip_noise' : 1 })<CR>
 nnoremap <silent> <Plug>movealongUp       :call movealong#syntax('zok^', { 'skip_noise' : 1 })<CR>
 
-nnoremap <silent><expr> <Plug>movealongColumnDown ":MovealongExpression zoj^ indent('.')==" . indent('.') . "<CR>"
-nnoremap <silent><expr> <Plug>movealongColumnUp   ":MovealongExpression zok^ indent('.')==" . indent('.') . "<CR>"
+nnoremap <silent><expr> <Plug>movealongIndentDown ":MovealongExpression zoj^ indent('.')==" . indent('.') . "<CR>"
+nnoremap <silent><expr> <Plug>movealongIndentUp   ":MovealongExpression zok^ indent('.')==" . indent('.') . "<CR>"
 
 " map default keys
 if g:movealong_default_keys
@@ -93,6 +93,6 @@ if g:movealong_default_keys
   nmap <silent> <S-Tab> <Plug>movealongUp
 
   " Ctrl-Tab and Ctrl-Shift+Tab - move to next/previous line with same indent
-  nmap <silent> <C-Tab>   <Plug>movealongColumnDown
-  nmap <silent> <C-S-Tab> <Plug>movealongColumnUp
+  nmap <silent> <C-Tab>   <Plug>movealongIndentDown
+  nmap <silent> <C-S-Tab> <Plug>movealongIndentUp
 endif

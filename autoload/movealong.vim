@@ -1,5 +1,5 @@
 " movealong.vim - Move along, nothing to see here.
-" Author:       Markus Koller
+" Author:       Markus Koller <http://github.com/toupeira/>
 " Version:      1.0
 " License:      Same as Vim itself.  See :help license
 

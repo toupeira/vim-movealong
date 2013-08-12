@@ -1,0 +1,160 @@
+*movealong.txt*  Intelligently repeat motion commands
+
+Author:  Markus Koller <http://github.com/toupeira/>
+Version: 1.0
+License: Same terms as Vim itself (see |license|)
+
+This plugin is only available if 'compatible' is not set.
+
+CONTENTS                                        *movealong-contents*
+
+Introduction       |movealong-introduction|
+Mappings           |movealong-mappings|
+Configuration      |movealong-configuration|
+Commands           |movealong-commands|
+Functions          |movealong-functions|
+
+------------------------------------------------------------------------------
+INTRODUCTION                                    *movealong*
+
+This plugin provides commands to repeat a motion (or any sequence of commands,
+really) until a condition has been met, for example a certain syntax group has
+been encountered, or an expression returns true.
+
+------------------------------------------------------------------------------
+MAPPINGS                                        *movealong-mappings*
+
+Normal mode mappings:
+
+<Plug>movealongForward
+        Move forward by word, skipping ignored syntax groups.
+
+<Plug>movealongBackward
+        Move backward by word, skipping ignored syntax groups.
+
+<Plug>movealongDown
+        Move down by line, skipping ignored syntax groups and syntax noise at
+        the beginning of the line.
+
+<Plug>movealongUp
+        Move up by line, skipping ignored syntax groups and syntax noise at
+        the beginning of the line.
+
+<Plug>movealongIndentDown
+        Move to the next line with the same indent as the current line.
+
+<Plug>movealongIndentUp
+        Move to the previous line with the same indent as the current line.
+
+------------------------------------------------------------------------------
+CONFIGURATION                                   *movealong-configuration*
+
+g:movealong_default_keys                        *g:movealong_default_keys*
+        Enable default keymaps for normal mode:
+
+          <Space>    <Plug>movealongForward
+          <S-Space>  <Plug>movealongBackward
+
+          <Tab>      <Plug>movealongForward
+          <S-Tab>    <Plug>movealongBackward
+
+          <C-Tab>    <Plug>movealongForward
+          <c-S-Tab>  <Plug>movealongBackward
+
+        The default value is 1.
+
+The following variables can also be overriden with buffer-level variables:
+
+g:movealong_max_motions                         *g:movealong_max_motions*
+        Set an upper limit for how many times the motion will be repeated,
+        this is to avoid infinite loops and other bugs.
+
+        The default value is 1000.
+
+g:movealong_cross_lines                         *g:movealong_cross_lines*
+        Specify if a motion can cross lines, otherwise the command will be
+        aborted.
+
+        The default value is 1.
+
+g:movealong_syntax                              *g:movealong_syntax*
+        Specify syntax groups to look for, if it's empty any syntax group will
+        be accepted.
+
+        The default value is [].
+
+g:movealong_skip_syntax                         *g:movealong_skip_syntax*
+        Specify syntax groups to skip over.
+
+        The default value is [ 'Noise', 'Comment', 'Statement', 'cInclude', 'rubyInclude', 'rubyDefine' ].
+
+g:movealong_skip_syntax_inline                  *g:movealong_skip_syntax_inline*
+        Specify syntax groups to skip over for inline motions.
+
+        The default value is [ 'Noise', 'Comment' ].
+
+g:movealong_skip_noise                          *g:movealong_skip_noise*
+        Specify if syntax noise should be skipped over after a successful
+        motion.
+
+        The default value is 0.
+
+g:movealong_skip_punct                          *g:movealong_skip_punct*
+        Specify if punctuation should be skipped over after a succesful
+        motion.
+
+        The default value is 1.
+
+g:movealong_skip_words                          *g:movealong_skip_words*
+        Specify words to skip over if they stand alone on a line.
+
+        The default value is a list of common words that end a block, see
+        plugin/movealong.vim for details.
+
+------------------------------------------------------------------------------
+COMMANDS                                        *movealong-commands*
+
+:MovealongSyntax {motion} {syntax}              *MovealongSyntax*
+        Repeat the {motion} until any of the specified {syntax} groups
+        are encountered, using |g:movealong_skip_syntax| as default.
+
+        Wrapper for |movealong#syntax()|.
+
+:MovealongSyntaxInline {motion} {syntax}        *MovealongSyntaxInline*
+        Repeat the {motion} until any of the specified {syntax} groups
+        are encountered, using |g:movealong_skip_syntax_inline`| as default.
+
+        Wrappers for |movealong#syntax()|.
+
+:MovealongNoise                                 *MovealongNoise*
+        Skip over any syntax noise.
+
+        Wrapper for |movealong#noise()|.
+
+:MovealongExpression {motion} {expr}            *MovealongExpression*
+        Repeat the {motion} until the {expr} returns true.
+
+        Wrapper for |movealong#expression()|.
+
+:MovealongWhatsWrong                            *MovealongWhatsWrong*
+        Show a message explaining why the last command stopped.
+
+------------------------------------------------------------------------------
+FUNCTIONS                                       *movealong-functions*
+
+movealong#syntax()                              *movealong#syntax()*
+
+movealong#noise()                               *movealong#noise()*
+
+movealong#expression()                          *movealong#expression()*
+
+movealong#whatswrong()                          *movealong#whatswrong()*
+
+------------------------------------------------------------------------------
+ABOUT                                           *movealong-about*
+
+Grab the latest version or report a bug on GitHub:
+
+http://github.com/toupeira/vim-movealong
+
+ vim:tw=78:et:ft=help:norl:
