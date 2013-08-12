@@ -68,7 +68,6 @@ function! movealong#until(motion, ...)
     \ 'cross_lines' : 1,
     \ 'cross_eof'   : 0,
   \ }, (type(last_arg) == type({})) ? last_arg : {})
-  "\ 'skip_syntax' : options['inline'] ? movealong#setting('skip_syntax_inline') : movealong#setting('skip_syntax'),
 
   " look for string arguments
   if a:0 > 0 && type(a:1) == type('')

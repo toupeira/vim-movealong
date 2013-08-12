@@ -89,11 +89,14 @@ COMMANDS                                        *movealong-commands*
 
 :MovealongSyntax {motion} {syntax}              *MovealongSyntax*
         Repeat the {motion} until any of the specified {syntax} groups
-        are encountered, using |g:movealong_skip_syntax| as default.
+        are encountered, separate multiple groups with commas.
+
+        Use this command for line-wise motions.
 
 :MovealongSyntaxInline {motion} {syntax}        *MovealongSyntaxInline*
-        Repeat the {motion} until any of the specified {syntax} groups
-        are encountered, using |g:movealong_skip_syntax`| as default.
+        Same as |MovealongSyntax|, but use inline mode.
+
+        Use this command for in-line motions.
 
 :MovealongNoise                                 *MovealongNoise*
         Skip over any syntax noise.
