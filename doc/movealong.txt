@@ -34,26 +34,22 @@ MAPPINGS                                        *movealong-mappings*
 Normal mode mappings:
 
 <Space>                                         *movealong-<Space>*
-        Move forward by word, skipping ignored syntax groups.
+        Move to the next useful word.
 
 <S-Space>                                       *movealong-<S-Space>*
-        Move backward by word, skipping ignored syntax groups.
+        Move to the previous useful word.
 
 <Tab>                                           *movealong-<Tab>*
-        Move down by line, skipping ignored syntax groups, and any
-        syntax noise at the beginning of the matched line.
+        Move to the next useful line.
 
 <S-Tab>                                         *movealong-<S-Tab>*
-        Move up by line, skipping ignored syntax groups, and any
-        syntax noise at the beginning of the matched line.
+        Move to the previous useful line.
 
 <C-Tab>                                         *movealong-<C-Tab>*
-        Move to the next line with the same indent as the current line,
-        and place the cursor at the beginning of the text.
+        Move to the next line with the same indent.
 
 <C-S-Tab>                                       *movealong-<C-S-Tab>*
-        Move to the previous line with the same indent as the current line.
-        and place the cursor at the beginning of the text.
+        Move to the previous line with the same indent.
 
 ------------------------------------------------------------------------------
 CONFIGURATION                                   *movealong-configuration*

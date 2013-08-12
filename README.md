@@ -14,4 +14,20 @@ into your .vimrc:
 let g:movealong_default_keys = 1
 ```
 
+The following keys will be mapped in normal mode:
+
+| Key | Map |   |
+|-----|-----|---|
+| `<Space>` | `:MovealongSyntaxInline w<CR>` | Move to the next useful word.
+| `<S-Space>` | `:MovealongSyntaxInline b<CR>` | Move to the previous useful word.
+| `<Tab>` | `:MovealongSyntax zoj^<CR>` | Move to the next useful line.
+| `<S-Tab>` | `:MovealongSyntax zok^<CR>` | Move to the previous useful line.
+
+| Key | Map |
+|-----|-----|
+| `<C-Tab>` | `<expr> ":MovealongExpression zoj^ indent('.')==" . indent('.') . "<CR>"`
+|           | Move to the next line with the same indent.
+| `<C-S-Tab>` | `<expr> ":MovealongExpression zok^ indent('.')==" . indent('.') . "<CR>"`
+|             |Move to the previous line with the same indent.
+
 [Read the full documentation online](http://vim-doc.heroku.com/view?https://raw.github.com/toupeira/vim-movealong/master/doc/movealong.txt)
