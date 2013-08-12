@@ -18,17 +18,17 @@ endfunction
 
 " get a setting from either the buffer or the global variable
 function! movealong#setting(key)
-  let l:key = 'movealong_' . a:key
-  if exists('b:' . l:key)
-    return eval('b:' . l:key)
+  let key = 'movealong_' . a:key
+  if exists('b:' . key)
+    return eval('b:' . key)
   else
-    return eval('g:' . l:key)
+    return eval('g:' . key)
   endif
 endfunction
 
 "  repeat a motion until encountering a given syntax type
 function! movealong#syntax(motion, ...)
-  let l:options = extend({
+  let options = extend({
     \ 'inline'      : 0,
     \ 'syntax'      : movealong#setting('syntax'),
     \ 'max_motions' : movealong#setting('max_motions'),
@@ -38,75 +38,75 @@ function! movealong#syntax(motion, ...)
     \ 'skip_words'  : movealong#setting('skip_words'),
   \ }, (a:0 > 0 && type(a:1) == type({})) ? a:1 : {})
 
-  let l:options = extend(l:options, {
-    \ 'skip_syntax' : l:options['inline'] ? movealong#setting('skip_syntax_inline') : movealong#setting('skip_syntax')
+  let options = extend(options, {
+    \ 'skip_syntax' : options['inline'] ? movealong#setting('skip_syntax_inline') : movealong#setting('skip_syntax')
   \ })
 
   if a:0 > 0 && type(a:1) == type('')
-    let l:options['syntax'] = split(a:1, ',')
+    let options['syntax'] = split(a:1, ',')
   endif
 
   if a:0 > 1 && type(a:2) == type('')
-    let l:options['skip_syntax'] = split(a:2, ',')
+    let options['skip_syntax'] = split(a:2, ',')
   endif
 
   if a:0 > 0 && type(a:000[a:0 - 1]) == type({})
-    let l:options = extend(l:options, a:000[a:0 - 1])
+    let options = extend(options, a:000[a:0 - 1])
   endif
 
-  let l:word = ''
-  let l:line_text = ''
-  let l:syntax = {}
-  let l:motions = 0
+  let word = ''
+  let line_text = ''
+  let syntax = {}
+  let motions = 0
 
   " add current position to jumplist
   normal m`
 
   while 1
     " run the motion
-    let l:last_pos = [ line('.'), col('.') ]
+    let last_pos = [ line('.'), col('.') ]
     silent! execute "normal " . a:motion
-    let l:pos = [ line('.'), col('.') ]
+    let pos = [ line('.'), col('.') ]
 
-    let l:motions += 1
-    if l:motions >= l:options['max_motions']
+    let motions += 1
+    if motions >= options['max_motions']
       " stop if the maximum number of motions was reached
-      return movealong#abort("Stopped because maximum number of motions '" . l:options['max_motions'] . "' was reached")
-    elseif !l:options['cross_lines'] && l:pos[0] != l:last_pos[0]
+      return movealong#abort("Stopped because maximum number of motions '" . options['max_motions'] . "' was reached")
+    elseif !options['cross_lines'] && pos[0] != last_pos[0]
       " stop if we don't want to cross lines
       return movealong#abort("Stopped because motion '" . a:motion . "' crossed line")
-    elseif l:pos == l:last_pos
+    elseif pos == last_pos
       " stop if the motion didn't change the cursor position
       return movealong#abort("Stopped because motion '" . a:motion . "'didn't change cursor position")
     endif
 
     " get inner word under cursor
-    let l:register = $"
+    let register = $"
     normal yiw
-    let l:word = getreg()
-    call setreg('', l:register)
+    let word = getreg()
+    call setreg('', register)
 
     " get text of current line, strip whitespace
-    let l:line_text = substitute(getline('.'), ' ', '', 'g')
+    let line_text = substitute(getline('.'), ' ', '', 'g')
 
-    if match(l:line_text, '[^ \t]') == -1
+    if match(line_text, '[^ \t]') == -1
       " skip blank lines
       call movealong#error("Skipped blank line")
       continue
-    elseif l:options['skip_punct'] && match(l:options['inline'] ? l:word : l:line_text, '\v^[[:punct:]]+$') > -1
+    elseif options['skip_punct'] && match(options['inline'] ? word : line_text, '\v^[[:punct:]]+$') > -1
       " skip punctuation
       call movealong#error("Skipped punctuation")
       continue
-    elseif !empty(l:options['skip_words']) && index(l:options['skip_words'], l:options['inline'] ? l:word : l:line_text) > -1
+    elseif !empty(options['skip_words']) && index(options['skip_words'], options['inline'] ? word : line_text) > -1
       " skip lines that only consist of an ignored word
       call movealong#error("Skipped word")
       continue
     endif
 
-    let l:syntax = movealong#syntax#current()
+    let syntax = movealong#syntax#current()
 
-    if !empty(l:options['syntax'])
-      if movealong#syntax#match(l:syntax, l:options['syntax'])
+    if !empty(options['syntax'])
+      if movealong#syntax#match(syntax, options['syntax'])
         " stop if syntax matches
         call movealong#error("Stopped because syntax matched")
         break
@@ -118,15 +118,15 @@ function! movealong#syntax(motion, ...)
     endif
 
     " skip ignored syntax types
-    if !empty(l:options['skip_syntax']) && movealong#syntax#match(l:syntax, l:options['skip_syntax'])
-      if l:syntax['name'] == 'Comment' || l:line_text == l:word || l:options['inline']
+    if !empty(options['skip_syntax']) && movealong#syntax#match(syntax, options['skip_syntax'])
+      if syntax['name'] == 'Comment' || line_text == word || options['inline']
         call movealong#error("Skipped ignored syntax")
         continue
       endif
     endif
 
     " stop at the first and last line
-    if l:pos[0] == 1 || l:pos[0] == line('$')
+    if pos[0] == 1 || pos[0] == line('$')
       return movealong#abort("Stopped at beginning/end of file")
     endif
 
@@ -134,49 +134,49 @@ function! movealong#syntax(motion, ...)
   endwhile
 
   " skip noise
-  if l:options['skip_noise']
+  if options['skip_noise']
     return movealong#syntax#noise()
   endif
 endfunction
 
 " repeat a motion until the given expression returns true
 function! movealong#expression(motion, expression, ...)
-  let l:options = extend({
+  let options = extend({
     \ 'inline'      : 0,
     \ 'max_motions' : movealong#setting('max_motions'),
     \ 'cross_lines' : movealong#setting('cross_lines'),
     \ 'skip_noise'  : 0,
   \ }, (a:0 > 0 && type(a:1) == type({})) ? a:1 : {})
 
-  let l:options = extend(l:options, {
-    \ 'skip_syntax' : l:options['inline'] ? movealong#setting('skip_syntax_inline') : movealong#setting('skip_syntax')
+  let options = extend(options, {
+    \ 'skip_syntax' : options['inline'] ? movealong#setting('skip_syntax_inline') : movealong#setting('skip_syntax')
   \ })
 
-  let l:motions = 0
+  let motions = 0
 
   " add current position to jumplist
   normal m`
 
   while 1
     " run the motion
-    let l:last_pos = [ line('.'), col('.') ]
+    let last_pos = [ line('.'), col('.') ]
     silent! execute "normal " . a:motion
-    let l:pos = [ line('.'), col('.') ]
+    let pos = [ line('.'), col('.') ]
 
-    let l:motions += 1
-    if l:motions >= l:options['max_motions']
+    let motions += 1
+    if motions >= options['max_motions']
       " stop if the maximum number of motions was reached
-      return movealong#abort("Stopped because maximum number of motions '" . l:options['max_motions'] . "' was reached")
-    elseif !l:options['cross_lines'] && l:pos[0] != l:last_pos[0]
+      return movealong#abort("Stopped because maximum number of motions '" . options['max_motions'] . "' was reached")
+    elseif !options['cross_lines'] && pos[0] != last_pos[0]
       " stop if we don't want to cross lines
       return movealong#abort("Stopped because motion '" . a:motion . "' crossed line")
-    elseif l:pos == l:last_pos
+    elseif pos == last_pos
       " stop if the motion didn't change the cursor position
       return movealong#abort("Stopped because motion '" . a:motion . "'didn't change cursor position")
     endif
 
     " stop at the first and last line
-    if l:pos[0] == 1 || l:pos[0] == line('$')
+    if pos[0] == 1 || pos[0] == line('$')
       return movealong#abort("Stopped at beginning/end of file")
     endif
 
@@ -187,7 +187,7 @@ function! movealong#expression(motion, expression, ...)
   endwhile
 
   " skip noise
-  if l:options['skip_noise']
+  if options['skip_noise']
     return movealong#syntax#noise()
   endif
 endfunction

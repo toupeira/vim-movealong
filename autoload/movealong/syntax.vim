@@ -5,14 +5,14 @@
 
 " get the syntax names for the current cursor position
 function! movealong#syntax#current()
-  let l:id       = synID(line('.'), col('.'), 1)
-  let l:name     = synIDattr(synIDtrans(l:id), 'name')
-  let l:original = synIDattr(l:id, 'name')
+  let id       = synID(line('.'), col('.'), 1)
+  let name     = synIDattr(synIDtrans(id), 'name')
+  let original = synIDattr(id, 'name')
 
   return {
-    \ 'id'       : l:id,
-    \ 'name'     : l:name,
-    \ 'original' : l:original,
+    \ 'id'       : id,
+    \ 'name'     : name,
+    \ 'original' : original,
   \ }
 endfunction
 
@@ -24,12 +24,12 @@ endfunction
 
 " skip over any syntax noise
 function! movealong#syntax#noise(...)
-  let l:options = extend({
+  let options = extend({
     \ 'inline'      : 1,
     \ 'syntax'      : [],
     \ 'skip_syntax' : movealong#setting('skip_syntax_inline'),
     \ 'cross_lines' : 0,
   \ }, a:0 > 0 ? a:1 : {})
 
-  return movealong#syntax('w', l:options)
+  return movealong#syntax('w', options)
 endfunction
