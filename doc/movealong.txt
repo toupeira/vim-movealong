@@ -84,7 +84,10 @@ COMMANDS                                        *movealong-commands*
 
 :MovealongSyntax {motion} {syntax}              *MovealongSyntax*
         Repeat the {motion} until any of the specified {syntax} groups
-        are encountered, separate multiple groups with commas.
+        are encountered.
+
+        {motion}  A string of commands to be repeated
+        {syntax}  A string of comma-separated syntax groups
 
         Use this command for line-wise motions.
 
@@ -98,6 +101,8 @@ COMMANDS                                        *movealong-commands*
 
 :MovealongExpression {motion} {expr}            *MovealongExpression*
         Repeat the {motion} until the {expr} returns true.
+
+        {expr}  A Vim expression, use backslashes for spaces.
 
 :MovealongWhatsWrong                            *MovealongWhatsWrong*
         Show a message explaining why the last command stopped.

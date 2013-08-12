@@ -19,7 +19,7 @@ function! movealong#whatswrong(...)
 endfunction
 
 " show an error and reset the cursor position
-function! movealong#abort(message)
+function! movealong#error(message)
   call movealong#whatswrong(a:message)
   echoerr "[movealong] " . a:message
   normal ``
@@ -61,8 +61,9 @@ function! movealong#until(motion, ...)
     \ 'expression'  : '',
     \ 'max_motions' : movealong#setting('max_motions'),
     \ 'syntax'      : [],
-    \ 'skip_noise'  : 1,
+    \ 'skip_blank'  : 1,
     \ 'skip_punct'  : 1,
+    \ 'skip_noise'  : 1,
     \ 'skip_syntax' : movealong#setting('skip_syntax'),
     \ 'skip_words'  : movealong#setting('skip_words'),
     \ 'cross_lines' : 1,
@@ -131,7 +132,7 @@ function! movealong#until(motion, ...)
     " get text of current line, strip whitespace
     let line_text = substitute(getline('.'), ' ', '', 'g')
 
-    if match(line_text, '[^ \t]') == -1
+    if options['skip_blank'] && match(options['inline'] ? word : line_text, '[^ \t]') == -1
       " skip blank lines
       call movealong#whatswrong("Skipped blank line")
       continue
