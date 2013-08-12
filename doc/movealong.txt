@@ -91,37 +91,18 @@ COMMANDS                                        *movealong-commands*
         Repeat the {motion} until any of the specified {syntax} groups
         are encountered, using |g:movealong_skip_syntax| as default.
 
-        Wrapper for |movealong#syntax()|.
-
 :MovealongSyntaxInline {motion} {syntax}        *MovealongSyntaxInline*
         Repeat the {motion} until any of the specified {syntax} groups
-        are encountered, using |g:movealong_skip_syntax_inline`| as default.
-
-        Wrappers for |movealong#syntax()|.
+        are encountered, using |g:movealong_skip_syntax`| as default.
 
 :MovealongNoise                                 *MovealongNoise*
         Skip over any syntax noise.
 
-        Wrapper for |movealong#noise()|.
-
 :MovealongExpression {motion} {expr}            *MovealongExpression*
         Repeat the {motion} until the {expr} returns true.
 
-        Wrapper for |movealong#expression()|.
-
 :MovealongWhatsWrong                            *MovealongWhatsWrong*
         Show a message explaining why the last command stopped.
-
-------------------------------------------------------------------------------
-FUNCTIONS                                       *movealong-functions*
-
-movealong#syntax()                              *movealong#syntax()*
-
-movealong#noise()                               *movealong#noise()*
-
-movealong#expression()                          *movealong#expression()*
-
-movealong#whatswrong()                          *movealong#whatswrong()*
 
 ------------------------------------------------------------------------------
 ABOUT                                           *movealong-about*
