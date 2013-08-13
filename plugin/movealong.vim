@@ -48,18 +48,18 @@ command! -nargs=0                      MovealongWhatsWrong   call movealong#what
 " map default keys
 if g:movealong_default_keys
   " Space - Move to the next useful word
-  noremap <silent> <Space>         :MovealongSyntaxInline w<CR>
+  nnoremap <silent> <Space>         :MovealongSyntaxInline w<CR>
   " Shift-Space Move to the previous useful word
-  noremap <silent> <S-Space>       :MovealongSyntaxInline b<CR>
+  nnoremap <silent> <S-Space>       :MovealongSyntaxInline b<CR>
 
   " Tab - Move to the next useful line
-  noremap <silent> <Tab>           :MovealongSyntax zoj^<CR>
+  nnoremap <silent> <Tab>           :MovealongSyntax zoj^<CR>
   " Shift-Tab - Move to the previous useful line
-  noremap <silent> <S-Tab>         :MovealongSyntax zok^<CR>
+  nnoremap <silent> <S-Tab>         :MovealongSyntax zok^<CR>
 
   " Ctrl-Tab - Move to the next line with the same indent
-  noremap <silent><expr> <C-Tab>   ":MovealongExpression zoj^ indent('.')==" . indent('.') . "<CR>"
+  nnoremap <silent><expr> <C-Tab>   ":MovealongExpression zoj^ indent('.')==" . indent('.') . "<CR>"
 
   " Ctrl-Shift-Tab - Move to the previous line with the same indent
-  noremap <silent><expr> <C-S-Tab> ":MovealongExpression zok^ indent('.')==" . indent('.') . "<CR>"
+  nnoremap <silent><expr> <C-S-Tab> ":MovealongExpression zok^ indent('.')==" . indent('.') . "<CR>"
 endif
