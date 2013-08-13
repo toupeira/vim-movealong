@@ -41,3 +41,7 @@ The following keys will be mapped in normal mode:
 Note that you can pass any sequence of normal mode commands as motions, so the
 possibilities are endless.  
 Let me know if you come up with any interesting commands!
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/toupeira/vim-movealong/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
