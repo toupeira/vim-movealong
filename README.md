@@ -30,4 +30,10 @@ The following keys will be mapped in normal mode:
 | `<C-S-Tab>` | `<expr> ":MovealongExpression zok^ indent('.')==" . indent('.') . "<CR>"`
 |             |Move to the previous line with the same indent.
 
-[Read the full documentation online](http://vim-doc.heroku.com/view?https://raw.github.com/toupeira/vim-movealong/master/doc/movealong.txt)
+## Customization
+
+[`:help movealong`](http://vim-doc.heroku.com/view?https://raw.github.com/toupeira/vim-movealong/master/doc/movealong.txt)
+
+Note that you can pass any sequence of normal mode commands as motions, so the
+possibilities are endless.  
+Let me know if you come up with any interesting commands!
