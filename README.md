@@ -37,15 +37,21 @@ The following keys will be mapped in normal mode:
   noremap <silent> <S-Tab>         :MovealongSyntax zok^<CR>
 
   " Ctrl-Tab - Move to the next line with the same indent
-  noremap <silent><expr> <C-Tab>   ":MovealongExpression zoj^ indent('.')==" . indent('.') . "<CR>"
+  noremap <silent><expr> <C-Tab>   ":MovealongExpression j^ indent('.')==" . indent('.') . "<CR>"
   
   " Ctrl-Shift-Tab - Move to the previous line with the same indent
-  noremap <silent><expr> <C-S-Tab> ":MovealongExpression zok^ indent('.')==" . indent('.') . "<CR>"
+  noremap <silent><expr> <C-S-Tab> ":MovealongExpression k^ indent('.')==" . indent('.') . "<CR>"
+
+  " <Leader>f - Move to the next function declaration
+  nnoremap <silent> <Leader>f :MovealongSyntax j^ vimFuncKey,rubyDefine,pythonFunction,phpFCKeyword<CR>
+
+  " <Leader>F - Move to the previous function declaration
+  nnoremap <silent> <Leader>F :MovealongSyntax k^ vimFuncKey,rubyDefine,pythonFunction,phpFCKeyword<CR>
 ```
 
 ## Customization
 
-[`:help movealong`](http://vim-doc.heroku.com/view?https://raw.github.com/toupeira/vim-movealong/master/doc/movealong.txt)
+See [`:help movealong`](http://vim-doc.heroku.com/view?https://raw.github.com/toupeira/vim-movealong/master/doc/movealong.txt) for more information.
 
 Note that you can pass any sequence of normal mode commands as motions, so the
 possibilities are endless.  
