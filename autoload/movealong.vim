@@ -91,6 +91,10 @@ function! movealong#until(motion, ...)
   let syntax = {}
   let motions = 0
 
+  let pos = []
+  let last_pos = []
+  let last_two_pos = []
+
   " add current position to jumplist
   normal m`
 
@@ -119,9 +123,15 @@ function! movealong#until(motion, ...)
         " stop if the motion didn't change the cursor position
         call movealong#abort("Stopped because motion '" . a:motion . "'didn't change cursor position")
         return
+      elseif [ pos, last_pos ] == last_two_pos
+        " stop if the motion doesn't seem to actually move
+        call movealong#abort("Stopped because motion '" . a:motion . "' seems to be stuck")
+        return
       endif
     endif
+
     let motions += 1
+    let last_two_pos = [ pos, last_pos ]
 
     " get inner word under cursor
     let register = $"
