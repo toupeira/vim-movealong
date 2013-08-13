@@ -16,19 +16,23 @@ let g:movealong_default_keys = 1
 
 The following keys will be mapped in normal mode:
 
-| Key | Map |   |
-|-----|-----|---|
-| `<Space>` | `:MovealongSyntaxInline w<CR>` | Move to the next useful word.
-| `<S-Space>` | `:MovealongSyntaxInline b<CR>` | Move to the previous useful word.
-| `<Tab>` | `:MovealongSyntax zoj^<CR>` | Move to the next useful line.
-| `<S-Tab>` | `:MovealongSyntax zok^<CR>` | Move to the previous useful line.
+```vim
+  " Space - Move to the next useful word
+  noremap <silent> <Space>         :MovealongSyntaxInline w<CR>
+  " Shift-Space Move to the previous useful word
+  noremap <silent> <S-Space>       :MovealongSyntaxInline b<CR>
 
-| Key | Map |
-|-----|-----|
-| `<C-Tab>` | `<expr> ":MovealongExpression zoj^ indent('.')==" . indent('.') . "<CR>"`
-|           | Move to the next line with the same indent.
-| `<C-S-Tab>` | `<expr> ":MovealongExpression zok^ indent('.')==" . indent('.') . "<CR>"`
-|             |Move to the previous line with the same indent.
+  " Tab - Move to the next useful line
+  noremap <silent> <Tab>           :MovealongSyntax zoj^<CR>
+  " Shift-Tab - Move to the previous useful line
+  noremap <silent> <S-Tab>         :MovealongSyntax zok^<CR>
+
+  " Ctrl-Tab - Move to the next line with the same indent
+  noremap <silent><expr> <C-Tab>   ":MovealongExpression zoj^ indent('.')==" . indent('.') . "<CR>"
+  
+  " Ctrl-Shift-Tab - Move to the previous line with the same indent
+  noremap <silent><expr> <C-S-Tab> ":MovealongExpression zok^ indent('.')==" . indent('.') . "<CR>"
+```
 
 ## Customization
 
