@@ -6,7 +6,7 @@ License: Same terms as Vim itself (see |license|)
 
 This plugin is only available if 'compatible' is not set.
 
-CONTENTS                                        *movealong-contents*
+CONTENTS                                        *movealong*
 
 Introduction       |movealong-introduction|
 Mappings           |movealong-mappings|
