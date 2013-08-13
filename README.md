@@ -14,6 +14,15 @@ into your .vimrc:
 let g:movealong_default_keys = 1
 ```
 
+You can also override any of the default keys as follows: >
+
+```vim
+  let g:movealong_default_maps = {
+    \ 'WordForward'  : '<Leader>w',
+    \ 'WordBackward' : '<Leader>b',
+  \ }
+```
+
 The following keys will be mapped in normal mode:
 
 ```vim
@@ -42,6 +51,4 @@ Note that you can pass any sequence of normal mode commands as motions, so the
 possibilities are endless.  
 Let me know if you come up with any interesting commands!
 
-
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/toupeira/vim-movealong/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-

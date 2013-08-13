@@ -3,63 +3,93 @@
 " Version:      1.0
 " License:      Same as Vim itself.  See :help license
 
-if exists("g:loaded_movealong") || &cp
+if exists("g:loaded_movealong") || &cp || !has('syntax')
   finish
 endif
 let g:loaded_movealong = 1
 
-" map default keys
-if !exists("g:movealong_default_keys")
-  let g:movealong_default_keys = 0
-endif
+function! s:check_defined(variable, default)
+  if !exists(a:variable)
+    let {a:variable} = a:default
+  endif
+endfunction
 
-" limit number of motions
-if !exists("g:movealong_max_motions")
-  let g:movealong_max_motions = 1000
-endif
+call s:check_defined('g:movealong_default_keys', 0)
 
-" syntax groups to skip
-if !exists("g:movealong_skip_syntax")
-  let g:movealong_skip_syntax = [ 'Noise', 'Comment', 'Statement', 'cInclude', 'rubyInclude', 'rubyDefine' ]
-endif
+let g:movealong_default_maps = extend({
+  \ 'WordForward'   : '<Space>',
+  \ 'WordBackward'  : '<Backspace>',
+  \ 'LineForward'      : '<Tab>',
+  \ 'LineBackward'        : '<S-Tab>',
+  \ 'IndentForward'    : '<C-Tab>',
+  \ 'IndentBackward'      : '<C-S-Tab>',
+  \ 'FunctionForward'  : '<Leader>f',
+  \ 'FunctionBackward'    : '<Leader>F',
+\ }, exists('g:movealong_default_maps') ? g:movealong_default_maps : {})
 
-" words to skip
-if !exists("g:movealong_skip_words")
-  let g:movealong_skip_words = [
-    \ 'fi',
-    \ 'end',
-    \ 'else',
-    \ 'done',
-    \ 'then',
-    \ 'endif',
-    \ 'endfor',
-    \ 'endwhile',
-    \ 'endfunction',
-  \ ]
-endif
+call s:check_defined('g:movealong_max_motions', 1000)
+
+call s:check_defined('g:movealong_skip_syntax', [
+  \ 'Noise',
+  \ 'Comment',
+  \ 'Statement',
+  \ 'cInclude',
+  \ 'rubyInclude',
+  \ 'rubyDefine',
+  \ 'pythonInclude',
+  \ 'phpInclude',
+  \ 'phpFCKeyword',
+\ ])
+
+call s:check_defined('g:movealong_function_syntax', [
+  \ 'vimFuncKey',
+  \ 'rubyDefine',
+  \ 'pythonFunction',
+  \ 'phpFCKeyword',
+\ ])
+
+call s:check_defined('g:movealong_skip_words', [
+  \ 'fi',
+  \ 'end',
+  \ 'else',
+  \ 'done',
+  \ 'then',
+  \ 'endif',
+  \ 'endfor',
+  \ 'endwhile',
+  \ 'endfunction',
+  \ 'class',
+  \ 'module',
+  \ 'private',
+  \ 'protected',
+  \ 'public',
+  \ 'static',
+  \ 'abstract',
+\ ])
 
 " set up commands
 command! -nargs=+ -complete=syntax     MovealongSyntax       call movealong#until(<f-args>)
 command! -nargs=+ -complete=syntax     MovealongSyntaxInline call movealong#until(<f-args>, { 'inline' : 1 })
 command! -nargs=+ -complete=expression MovealongExpression   call movealong#until(<f-args>, { 'expression' : 1 })
-command! -nargs=0                      MovealongNoise        call movealong#noise()
-command! -nargs=0                      MovealongWhatsWrong   call movealong#whatswrong()
+command! -nargs=0                      MovealongNoise        call movealong#skip_noise()
+command! -nargs=0                      MovealongWhatsWrong   call movealong#util#whatswrong()
+
+" set up default maps
+nnoremap <silent> <Plug>movealongWordForward  :MovealongSyntaxInline w<CR>
+nnoremap <silent> <Plug>movealongWordBackward :MovealongSyntaxInline b<CR>
+
+nnoremap <silent> <Plug>movealongLineForward  :MovealongSyntax j^<CR>
+nnoremap <silent> <Plug>movealongLineBackward :MovealongSyntax k^<CR>
+
+nnoremap <silent><expr> <Plug>movealongFunctionForward  ":MovealongSyntax j^ " . join(movealong#util#setting('function_syntax'), ',') . "<CR>"
+nnoremap <silent><expr> <Plug>movealongFunctionBackward ":MovealongSyntax k^ " . join(movealong#util#setting('function_syntax'), ',') . "<CR>"
+
+nnoremap <silent><expr> <Plug>movealongIndentForward    ":MovealongExpression j^ indent('.')==" . indent('.') . "<CR>"
+nnoremap <silent><expr> <Plug>movealongIndentBackward   ":MovealongExpression k^ indent('.')==" . indent('.') . "<CR>"
 
 " map default keys
 if g:movealong_default_keys
-  " Space - Move to the next useful word
-  nnoremap <silent> <Space>         :MovealongSyntaxInline w<CR>
-  " Shift-Space Move to the previous useful word
-  nnoremap <silent> <S-Space>       :MovealongSyntaxInline b<CR>
-
-  " Tab - Move to the next useful line
-  nnoremap <silent> <Tab>           :MovealongSyntax zoj^<CR>
-  " Shift-Tab - Move to the previous useful line
-  nnoremap <silent> <S-Tab>         :MovealongSyntax zok^<CR>
-
-  " Ctrl-Tab - Move to the next line with the same indent
-  nnoremap <silent><expr> <C-Tab>   ":MovealongExpression zoj^ indent('.')==" . indent('.') . "<CR>"
-
-  " Ctrl-Shift-Tab - Move to the previous line with the same indent
-  nnoremap <silent><expr> <C-S-Tab> ":MovealongExpression zok^ indent('.')==" . indent('.') . "<CR>"
+  for [plug, key] in items(g:movealong_default_maps)
+    execute "nmap <silent> " . key . " <Plug>movealong" . plug
+  endfor
 endif

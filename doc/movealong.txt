@@ -20,36 +20,66 @@ This plugin gives you commands to repeat a motion until either a specific
 syntax group is encountered, or an arbitrary expression returns true.
 It also skips over blank lines, punctuation and other syntax noise.
 
-The provided default keymaps use Tab / Shift+Tab to move around lines,
-and Space / Shift+Space to move around words. Since this is pretty intrusive
-these mappings are disabled by default, enable them by putting the following
-into your .vimrc: >
+The included default keymaps are disabled by default, you can enable them
+by putting the following into your |.vimrc|: >
 
   let g:movealong_default_keys = 1
 <
+
+You can also override any of the default keys as follows: >
+
+  let g:movealong_default_maps = {
+    \ 'WordForward'  : '<Leader>w',
+    \ 'WordBackward' : '<Leader>b',
+  \ }
+<
+
+See |movealong-mappings| for a list of all the available mapping names.
+Your custom keys will be merged with the default keys as defined in
+`plugin/movealong.vim`.
 
 ------------------------------------------------------------------------------
 MAPPINGS                                        *movealong-mappings*
 
 Normal mode mappings:
 
-<Space>                                         *movealong-<Space>*
+<Plug>movealongWordForward                      *<Plug>movealongWordForward*
+<Space>
         Move to the next useful word.
 
-<S-Space>                                       *movealong-<S-Space>*
+<Plug>movealongWordBackward                     *<Plug>movealongWordBackward*
+<Backspace>
         Move to the previous useful word.
 
-<Tab>                                           *movealong-<Tab>*
+<Plug>movealongLineForward                      *<Plug>movealongLineForward*
+<Tab>
         Move to the next useful line.
 
-<S-Tab>                                         *movealong-<S-Tab>*
+<Plug>movealongLineBackward                     *<Plug>movealongLineBackward*
+<S-Tab>
         Move to the previous useful line.
 
-<C-Tab>                                         *movealong-<C-Tab>*
+<Plug>movealongIndentForward                    *<Plug>movealongIndentForward*
+<C-Tab>
         Move to the next line with the same indent.
 
-<C-S-Tab>                                       *movealong-<C-S-Tab>*
+<Plug>movealongIndentBackward                   *<Plug>movealongIndentBackward*
+<C-S-Tab>
         Move to the previous line with the same indent.
+
+<Plug>movealongFunctionForward                  *<Plug>movealongFunctionForward*
+<Leader>f
+        Move to the next function declaration.
+
+<Plug>movealongFunctionBackward                 *<Plug>movealongFunctionBackward*
+<Leader>F
+        Move to the previous function declaration.
+
+        NOTE: Unfortunately there doesn't seem to be a common syntax group for
+        function declarations, so at the moment a hard-coded list of
+        filetype-specific groups is used. You can override this by setting
+        `g:movealong_function_syntax` or `b:movealong_function_syntax` to a |List|
+        of syntax group names.
 
 ------------------------------------------------------------------------------
 CONFIGURATION                                   *movealong-configuration*
@@ -57,7 +87,13 @@ CONFIGURATION                                   *movealong-configuration*
 g:movealong_default_keys                        *g:movealong_default_keys*
         Enable default keymaps for normal mode (see |movealong-mappings|).
 
-        The default value is 0.
+        The default value is `0`.
+
+g:movealong_default_maps                        *g:movealong_default_maps*
+        A |Dict| of keys to be mapped to the provided default actions.
+
+        See |movealong-mappings| and `plugin/movealong.vim` for the default
+        values.
 
 The following variables can also be overriden with buffer-level variables
 for filetype-specific configuration:
@@ -66,18 +102,17 @@ g:movealong_max_motions                         *g:movealong_max_motions*
         Set an upper limit for how many times the motion will be repeated,
         this is to avoid infinite loops and other bugs.
 
-        The default value is 1000.
+        The default value is `1000`.
 
 g:movealong_skip_syntax                         *g:movealong_skip_syntax*
-        Syntax groups that should be skipped by default.
+        A |List| of syntax groups that should be skipped by default.
 
-        The default value is [ 'Noise', 'Comment', 'Statement', 'cInclude', 'rubyInclude', 'rubyDefine' ].
+        See `plugin/movealong.vim` for the default value.
 
 g:movealong_skip_words                          *g:movealong_skip_words*
-        Words that should be skipped by default.
+        A |List| of words that should be skipped by default.
 
-        The default value is a list of common tokens that end a block, see
-        plugin/movealong.vim for details.
+        See `plugin/movealong.vim` for the default value.
 
 ------------------------------------------------------------------------------
 COMMANDS                                        *movealong-commands*
