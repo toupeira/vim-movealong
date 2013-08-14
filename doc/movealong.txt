@@ -117,39 +117,66 @@ g:movealong_skip_words                          *g:movealong_skip_words*
 ------------------------------------------------------------------------------
 COMMANDS                                        *movealong-commands*
 
-:MovealongSyntax {motion} {syntax}              *MovealongSyntax*
-        Repeat the {motion} until any of the specified {syntax} groups
-        are encountered.
+:Movealong {motion} [options]                   *:Movealong*
+        Repeat the |motion| until any of the given conditions are met.
 
-        {motion}  A string of commands to be repeated
-        {syntax}  A string of comma-separated syntax groups
+        You can pass the following options:
 
-        Use this command for line-wise motions.
+        -syntax {syntax}
+            Specify one ore more syntax groups to match, separated
+            by commas.
 
-:MovealongSyntaxInline {motion} {syntax}        *MovealongSyntaxInline*
-        Same as |MovealongSyntax|, but use inline mode.
 
-        Use this command for in-line motions.
+        -expression {expr}
+            Specify an |expression| that has to return true.
+
+        -pattern {pattern}
+            Specify a |pattern| to match.
+
+        -inline
+            Use this for |characterwise| motions, in this mode the
+            inner |word| under the cursor will be used for matching
+            instead of the whole line.
+
+        -initial {bool}
+            Perform initial motion before checking context.
+            Default: 1
+
+        -skip-noise {bool}
+            Run MovealongNoise after a successful motion.
+            Default: 1, or 0 if an expression or pattern was passed
+
+        -skip-blank {bool}
+            Skip over any whitespace.
+            Default: 1
+
+        -skip-punct {bool}
+            Skip over any punctuation. (see |[:punct:]|)
+            Default: 1
+
+        -skip-syntax {bool}
+            Skip over the specified syntax groups.
+            Default: |g:movealong_skip_syntax|
+
+        -skip-words {bool}
+            Skip over the specified words.
+            Default: |g:movealong_skip_words|
+
+        -max-motions {number}
+            Abort if the motion has been repeated [number] times.
+            Default: |g:movealong_max_motions|
+
+        -cross-lines {bool}
+            Continue if a motion changes the current line.
+            Default: 1
+
+        -cross-eof {bool}
+            Continue if a motion wraps around the file boundaries.
+            Default: 0
 
 :MovealongNoise                                 *MovealongNoise*
-        Skip over any syntax noise.
-
-:MovealongExpression {motion} {expr}            *MovealongExpression*
-        Repeat the {motion} until the {expr} returns true.
-
-        {expr}  A Vim expression, use backslashes for spaces.
-
-:MovealongExpressionInline {motion} {expr}      *MovealongExpressionInline*
-        Same as |MovealongExpression|, but use inline mode.
-
-:MovealongWord {motion} {words}                 *MovealongWord*
-        Repeat the {motion} until the inner word under the cursor
-        matches {words}.
-
-        {words}  A string of comma-separated words
-
-:MovealongWordInline {motion} {words}           *MovealongWordInline*
-        Same as |MovealongWord|, but use inline mode.
+        Convenience wrapper to skip only over blank lines, punctuation
+        and syntax noise.
 
 :MovealongWhatsWrong                            *MovealongWhatsWrong*
         Show a message explaining why the last command stopped.

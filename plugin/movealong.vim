@@ -72,28 +72,23 @@ call s:check_defined('g:movealong_skip_syntax_overrides', {
   \ 'Statement': '(return|super)',
 \ })
 
-" set up commands
-command! -nargs=+ -complete=syntax     MovealongSyntax            call movealong#until(<f-args>)
-command! -nargs=+ -complete=syntax     MovealongSyntaxInline      call movealong#until(<f-args>, { 'inline' : 1 })
-command! -nargs=+ -complete=expression MovealongExpression        call movealong#until(<f-args>, { 'expression' : 1 })
-command! -nargs=+ -complete=expression MovealongExpressionInline  call movealong#until(<f-args>, { 'expression' : 1, 'inline' : 1 })
-command! -nargs=+ -complete=expression MovealongWord              call movealong#until(<f-args>, { 'words' : 1 })
-command! -nargs=+ -complete=expression MovealongWordInline        call movealong#until(<f-args>, { 'words' : 1, 'inline' : 1 })
+" define commands
+command! -nargs=+ -complete=command    Movealong                  call movealong#until(<f-args>)
 command! -nargs=0                      MovealongNoise             call movealong#skip_noise()
 command! -nargs=0                      MovealongWhatsWrong        call movealong#util#whatswrong()
 
 " set up default maps
-nnoremap <silent> <Plug>movealongWordForward  :MovealongSyntaxInline w<CR>
-nnoremap <silent> <Plug>movealongWordBackward :MovealongSyntaxInline b<CR>
+nnoremap <silent> <Plug>movealongWordForward  :Movealong -inline w<CR>
+nnoremap <silent> <Plug>movealongWordBackward :Movealong -inline b<CR>
 
-nnoremap <silent> <Plug>movealongLineForward  :MovealongSyntax j^<CR>
-nnoremap <silent> <Plug>movealongLineBackward :MovealongSyntax k^<CR>
+nnoremap <silent> <Plug>movealongLineForward  :Movealong j^<CR>
+nnoremap <silent> <Plug>movealongLineBackward :Movealong k^<CR>
 
-nnoremap <silent><expr> <Plug>movealongFunctionForward  ":MovealongSyntax j^ " . join(movealong#util#setting('function_syntax'), ',') . "<CR>"
-nnoremap <silent><expr> <Plug>movealongFunctionBackward ":MovealongSyntax k^ " . join(movealong#util#setting('function_syntax'), ',') . "<CR>"
+nnoremap <silent><expr> <Plug>movealongFunctionForward  ":Movealong j^ -syntax " . join(movealong#util#setting('function_syntax'), ',') . "<CR>"
+nnoremap <silent><expr> <Plug>movealongFunctionBackward ":Movealong k^ -syntax " . join(movealong#util#setting('function_syntax'), ',') . "<CR>"
 
-nnoremap <silent><expr> <Plug>movealongIndentForward    ":MovealongExpression j^ indent('.')==" . indent('.') . "<CR>"
-nnoremap <silent><expr> <Plug>movealongIndentBackward   ":MovealongExpression k^ indent('.')==" . indent('.') . "<CR>"
+nnoremap <silent><expr> <Plug>movealongIndentForward    ":Movealong j^ -expression indent('.')==" . indent('.') . "<CR>"
+nnoremap <silent><expr> <Plug>movealongIndentBackward   ":Movealong k^ -expression indent('.')==" . indent('.') . "<CR>"
 
 " map default keys
 if g:movealong_default_keys
