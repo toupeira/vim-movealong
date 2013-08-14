@@ -73,11 +73,14 @@ call s:check_defined('g:movealong_skip_syntax_overrides', {
 \ })
 
 " set up commands
-command! -nargs=+ -complete=syntax     MovealongSyntax       call movealong#until(<f-args>)
-command! -nargs=+ -complete=syntax     MovealongSyntaxInline call movealong#until(<f-args>, { 'inline' : 1 })
-command! -nargs=+ -complete=expression MovealongExpression   call movealong#until(<f-args>, { 'expression' : 1 })
-command! -nargs=0                      MovealongNoise        call movealong#skip_noise()
-command! -nargs=0                      MovealongWhatsWrong   call movealong#util#whatswrong()
+command! -nargs=+ -complete=syntax     MovealongSyntax            call movealong#until(<f-args>)
+command! -nargs=+ -complete=syntax     MovealongSyntaxInline      call movealong#until(<f-args>, { 'inline' : 1 })
+command! -nargs=+ -complete=expression MovealongExpression        call movealong#until(<f-args>, { 'expression' : 1 })
+command! -nargs=+ -complete=expression MovealongExpressionInline  call movealong#until(<f-args>, { 'expression' : 1, 'inline' : 1 })
+command! -nargs=+ -complete=expression MovealongWord              call movealong#until(<f-args>, { 'words' : 1 })
+command! -nargs=+ -complete=expression MovealongWordInline        call movealong#until(<f-args>, { 'words' : 1, 'inline' : 1 })
+command! -nargs=0                      MovealongNoise             call movealong#skip_noise()
+command! -nargs=0                      MovealongWhatsWrong        call movealong#util#whatswrong()
 
 " set up default maps
 nnoremap <silent> <Plug>movealongWordForward  :MovealongSyntaxInline w<CR>

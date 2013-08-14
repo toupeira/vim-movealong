@@ -17,7 +17,7 @@ Commands           |movealong-commands|
 INTRODUCTION                                    *movealong-introduction*
 
 This plugin gives you commands to repeat a motion until either a specific
-syntax group is encountered, or an arbitrary expression returns true.
+word or syntax group is encountered, or an arbitrary expression returns true.
 It also skips over blank lines, punctuation and other syntax noise.
 
 The included default keymaps are disabled by default, you can enable them
@@ -138,6 +138,18 @@ COMMANDS                                        *movealong-commands*
         Repeat the {motion} until the {expr} returns true.
 
         {expr}  A Vim expression, use backslashes for spaces.
+
+:MovealongExpressionInline {motion} {expr}      *MovealongExpressionInline*
+        Same as |MovealongExpression|, but use inline mode.
+
+:MovealongWord {motion} {words}                 *MovealongWord*
+        Repeat the {motion} until the inner word under the cursor
+        matches {words}.
+
+        {words}  A string of comma-separated words
+
+:MovealongWordInline {motion} {words}           *MovealongWordInline*
+        Same as |MovealongWord|, but use inline mode.
 
 :MovealongWhatsWrong                            *MovealongWhatsWrong*
         Show a message explaining why the last command stopped.
