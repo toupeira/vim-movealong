@@ -60,11 +60,11 @@ Normal mode mappings:
         Move to the previous useful line.
 
 <Plug>movealongIndentForward                    *<Plug>movealongIndentForward*
-<C-Tab>
+<Leader>i
         Move to the next line with the same indent.
 
 <Plug>movealongIndentBackward                   *<Plug>movealongIndentBackward*
-<C-S-Tab>
+<Leader>I
         Move to the previous line with the same indent.
 
 <Plug>movealongFunctionForward                  *<Plug>movealongFunctionForward*

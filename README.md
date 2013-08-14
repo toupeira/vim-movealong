@@ -36,10 +36,10 @@ The following keys will be mapped in normal mode:
   " Shift-Tab - Move to the previous useful line
   noremap <silent> <S-Tab>         :MovealongSyntax zok^<CR>
 
-  " Ctrl-Tab - Move to the next line with the same indent
+  " <Leader>i - Move to the next line with the same indent
   noremap <silent><expr> <C-Tab>   ":MovealongExpression j^ indent('.')==" . indent('.') . "<CR>"
   
-  " Ctrl-Shift-Tab - Move to the previous line with the same indent
+  " <Leader>I - Move to the previous line with the same indent
   noremap <silent><expr> <C-S-Tab> ":MovealongExpression k^ indent('.')==" . indent('.') . "<CR>"
 
   " <Leader>f - Move to the next function declaration

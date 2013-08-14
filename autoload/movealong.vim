@@ -7,18 +7,19 @@
 function! movealong#until(motion, ...)
   let last_arg = a:0 > 0 ? a:000[a:0 - 1] : 0
   let options = extend({
-    \ 'inline'      : 0,
-    \ 'initial'     : 1,
-    \ 'expression'  : '',
-    \ 'max_motions' : movealong#util#setting('max_motions'),
-    \ 'syntax'      : [],
-    \ 'skip_blank'  : 1,
-    \ 'skip_punct'  : 1,
-    \ 'skip_noise'  : 1,
-    \ 'skip_syntax' : movealong#util#setting('skip_syntax'),
-    \ 'skip_words'  : movealong#util#setting('skip_words'),
-    \ 'cross_lines' : 1,
-    \ 'cross_eof'   : 0,
+    \ 'inline'       : 0,
+    \ 'initial'      : 1,
+    \ 'expression'   : '',
+    \ 'max_motions'  : movealong#util#setting('max_motions'),
+    \ 'syntax'       : [],
+    \ 'words'        : [],
+    \ 'skip_blank'   : 1,
+    \ 'skip_punct'   : 1,
+    \ 'skip_noise'   : 1,
+    \ 'skip_syntax'  : movealong#util#setting('skip_syntax'),
+    \ 'skip_words'   : movealong#util#setting('skip_words'),
+    \ 'cross_lines'  : 1,
+    \ 'cross_eof'    : 0,
   \ }, (type(last_arg) == type({})) ? last_arg : {})
 
   " look for string arguments
@@ -37,8 +38,16 @@ function! movealong#until(motion, ...)
     endif
   endif
 
+  if a:0 > 0
+    let last = a:000[a:0 - 1]
+    if type(last) == type('') && last[0] == '{'
+      let options = extend(options, eval(last))
+    endif
+  endif
+
   " transform syntax groups and skipwords into regexes
   let options['syntax']      = empty(options['syntax'])      ? '' : '\v^(' . join(options['syntax'], '|') . ')$'
+  let options['words']       = empty(options['words'])       ? '' : '\v^(' . join(options['words'], '|') . ')$'
   let options['skip_syntax'] = empty(options['skip_syntax']) ? '' : '\v^(' . join(options['skip_syntax'], '|') . ')$'
   let options['skip_words']  = empty(options['skip_words'])  ? '' : '\v^(' . join(options['skip_words'], '|') . ')$'
 
@@ -107,31 +116,25 @@ function! movealong#until(motion, ...)
     let line_text = substitute(getline('.'), ' ', '', 'g')
     let match_text = options['inline'] ? word : line_text
 
-    if options['skip_blank'] && match(match_text, '[^ \t]') == -1
-      " skip blank lines
-      call movealong#util#whatswrong("Skipped blank line")
-      continue
-    elseif options['skip_punct'] && match(match_text, '\v^[[:punct:]]+$') > -1
-      " skip punctuation
-      call movealong#util#whatswrong("Skipped punctuation '" . match_text . "'")
-      continue
-    elseif !empty(options['skip_words']) && match(match_text, options['skip_words']) > -1
-      " skip lines that only consist of an ignored word
-      call movealong#util#whatswrong("Skipped word '" . match_text . "'")
-      continue
+    if !empty(options['words'])
+      if match(match_text, options['words']) > -1
+        call movealong#util#whatswrong("Stopped because word '" . match_text . "' was matched")
+        return
+      else
+        call movealong#util#whatswrong("Skipped because word '" . match_text . "' didn't match")
+        continue
+      endif
     endif
 
     if !empty(options['expression'])
       if eval(options['expression'])
         call movealong#util#whatswrong("Stopped because expression returned true")
-        break
+        return
       else
         call movealong#util#whatswrong("Skipped because expression returned false")
         continue
       endif
     endif
-
-    let syntax = movealong#util#syntax()
 
     if !empty(options['syntax'])
       if movealong#util#match_syntax(syntax, options['syntax'])
@@ -145,8 +148,38 @@ function! movealong#until(motion, ...)
       endif
     endif
 
+    if options['skip_blank'] && match(match_text, '[^ \t]') == -1
+      " skip blank lines
+      call movealong#util#whatswrong("Skipped blank line")
+      continue
+    elseif options['skip_punct'] && word != line_text && match(match_text, '\v^[[:punct:]]+$') > -1
+      " skip punctuation
+      call movealong#util#whatswrong("Skipped punctuation '" . match_text . "'")
+      continue
+    elseif !empty(options['skip_words']) && match(match_text, options['skip_words']) > -1
+      " skip lines that only consist of an ignored word
+      call movealong#util#whatswrong("Skipped word '" . match_text . "'")
+      continue
+    endif
+
+    let syntax = movealong#util#syntax()
+
     " skip ignored syntax types
     if !empty(options['skip_syntax']) && movealong#util#match_syntax(syntax, options['skip_syntax'])
+      let overrides = movealong#util#setting('skip_syntax_overrides')
+      if has_key(syntax, 'name') && has_key(overrides, syntax['name'])
+        let words = overrides[syntax['name']]
+      elseif has_key(syntax, 'original') && has_key(overrides, syntax['original'])
+        let words = overrides[syntax['original']]
+      else
+        let words = ''
+      endif
+
+      if !empty(words) && match(match_text, words) > -1
+        call movealong#util#whatswrong("Stopped because keyword '" . match_text . "' with syntax group " . syntax['name'] . " was overriden")
+        return
+      endif
+
       if syntax['name'] == 'Comment' || line_text == word || options['inline']
         call movealong#util#whatswrong("Skipped ignored syntax")
         continue

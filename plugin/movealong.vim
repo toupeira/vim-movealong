@@ -21,8 +21,8 @@ let g:movealong_default_maps = extend({
   \ 'WordBackward'  : '<Backspace>',
   \ 'LineForward'      : '<Tab>',
   \ 'LineBackward'        : '<S-Tab>',
-  \ 'IndentForward'    : '<C-Tab>',
-  \ 'IndentBackward'      : '<C-S-Tab>',
+  \ 'IndentForward'    : '<Leader>i',
+  \ 'IndentBackward'      : '<Leader>I',
   \ 'FunctionForward'  : '<Leader>f',
   \ 'FunctionBackward'    : '<Leader>F',
 \ }, exists('g:movealong_default_maps') ? g:movealong_default_maps : {})
@@ -66,6 +66,11 @@ call s:check_defined('g:movealong_skip_words', [
   \ 'static',
   \ 'abstract',
 \ ])
+
+" overrides for useful keywords that have an ignored syntax group
+call s:check_defined('g:movealong_skip_syntax_overrides', {
+  \ 'Statement': '(return|super)',
+\ })
 
 " set up commands
 command! -nargs=+ -complete=syntax     MovealongSyntax       call movealong#until(<f-args>)
