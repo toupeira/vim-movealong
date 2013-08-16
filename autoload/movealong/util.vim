@@ -13,42 +13,10 @@ function! movealong#util#setting(key)
   endif
 endfunction
 
-" set or show last error message
-function! movealong#util#whatswrong(...)
-  if a:0 > 0
-    if type(a:1) == type([])
-      let s:error_pos = [ a:1, a:2 ]
-    elseif type(a:1) == type({})
-      let s:error_syntax = a:1
-    else
-      let s:error = a:1
-    endif
-  elseif exists('s:error')
-    echohl WarningMsg
-    let message = "[movealong] " . s:error
-
-    if exists('s:error_pos')
-      let message .= " [pos" . join(s:error_pos[0], '/') . "]"
-      let message .= " [last:"     . join(s:error_pos[1], '/') . "]"
-    endif
-
-    if exists('s:error_syntax')
-      let message .= " [syntax:" . s:error_syntax['name'] . "/" . s:error_syntax['original'] . "]"
-    endif
-
-    echomsg message
-    echohl none
-  else
-    echohl MoreMsg
-    echomsg "[movealong] Nothing to see here, move along!"
-    echohl none
-  endif
-endfunction
-
 " store an error and reset the cursor position
 function! movealong#util#abort(message)
   execute "normal \<Esc>"
-  call movealong#util#whatswrong(a:message)
+  call movealong#whatswrong(a:message)
   normal ``
 endfunction
 
@@ -78,6 +46,10 @@ function! movealong#util#match_syntax(syntax, pattern)
 endfunction
 
 " parse option arguments
+let s:bool_options = join([ 'defaults', 'inline', 'initial', 'skip_blank', 'skip_punct', 'skip_noise', 'cross_lines', 'cross_eof', 'debug' ], '|')
+let s:list_options = join([ 'syntax', 'skip_syntax', 'skip_words' ], '|')
+let s:expr_options = join([ 'pattern', 'expression' ], '|')
+
 function! movealong#util#parse_options(options, args)
   let options = a:options
   let args = copy(a:args)
@@ -85,33 +57,52 @@ function! movealong#util#parse_options(options, args)
 
   while !empty(args)
     if type(args[0]) == type({})
+      " merge options
       let options = extend(options, args[0])
+      unlet args[0]
+      continue
     elseif type(args[0]) != type('')
       echoerr "Invalid argument '" . args[0] . "'"
       return
-    elseif args[0][0] == '-'
-      let option = substitute(args[0][1:-1], '-', '_', 'g')
-      if option == 'inline'
-        let options[option] = 1
-      elseif len(args) == 1
-        echoerr "Argument required for option '" . option . "'"
-        return
-      elseif match(option, '\v^(syntax|skip_syntax|skip_words)$') > -1
-        let options[option] = split(args[1], ',')
+    elseif args[0][0] != '-'
+      " use as motion
+      if empty(motion)
+        let motion = args[0]
         unlet args[0]
+        continue
       else
-        let options[option] = eval(args[1])
-        unlet args[0]
+        echoerr "Passed more than one motion argument"
+        return
       endif
-    elseif args[0][0] == '{'
-      let options = extend(options, eval(args[0]))
-    elseif empty(motion)
-      let motion = args[0]
-    else
-      echoerr "Passed more than one motion argument"
-      return
     endif
 
+    " parse options
+    let option = substitute(args[0][1:-1], '-', '_', 'g')
+
+    if match(option, '\v^(' . s:bool_options . ')$') > -1
+      let options[option] = 1
+    elseif match(option, '\v^no-( ' . s:bool_options . ')$') > -1
+      let options[option] = 0
+    elseif len(args) == 1
+      echoerr "Argument required for option '" . option . "'"
+      return
+    elseif match(option, '\v^(' . s:list_options . ')$') > -1
+      let options[option] = split(args[1], ',')
+      " delete option argument
+      unlet args[0]
+    else
+      let options[option] = args[1]
+
+      if match(option, '\v^(' . s:expr_options . ')$') > -1
+        let options[option] = substitute(options[option], '\v(\<\w+\>)', '\=expand(submatch(1))', 'g')
+        let options[option] = substitute(options[option], '\v(\@[^\w[:punct:]]+)', '\=eval(submatch(1))', 'g')
+      endif
+
+      " delete option argument
+      unlet args[0]
+    endif
+
+    " delete option
     unlet args[0]
   endwhile
 

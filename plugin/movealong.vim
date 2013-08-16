@@ -74,18 +74,17 @@ call s:check_defined('g:movealong_skip_syntax_overrides', {
 
 " define commands
 command! -nargs=+ -complete=command    Movealong                  call movealong#until(<f-args>)
-command! -nargs=0                      MovealongNoise             call movealong#skip_noise()
-command! -nargs=0                      MovealongWhatsWrong        call movealong#util#whatswrong()
+command! -nargs=0                      MovealongWhatsWrong        call movealong#whatswrong()
 
 " set up default maps
-nnoremap <silent> <Plug>movealongWordForward  :Movealong -inline w<CR>
-nnoremap <silent> <Plug>movealongWordBackward :Movealong -inline b<CR>
+nnoremap <silent> <Plug>movealongWordForward  :Movealong w -defaults<CR>
+nnoremap <silent> <Plug>movealongWordBackward :Movealong b -defaults<CR>
 
-nnoremap <silent> <Plug>movealongLineForward  :Movealong j^<CR>
-nnoremap <silent> <Plug>movealongLineBackward :Movealong k^<CR>
+nnoremap <silent> <Plug>movealongLineForward  :Movealong j^ -defaults<CR>
+nnoremap <silent> <Plug>movealongLineBackward :Movealong k^ -defaults<CR>
 
-nnoremap <silent><expr> <Plug>movealongFunctionForward  ":Movealong j^ -syntax " . join(movealong#util#setting('function_syntax'), ',') . "<CR>"
-nnoremap <silent><expr> <Plug>movealongFunctionBackward ":Movealong k^ -syntax " . join(movealong#util#setting('function_syntax'), ',') . "<CR>"
+nnoremap <silent><expr> <Plug>movealongFunctionForward  ":Movealong j^ -defaults -syntax " . join(movealong#util#setting('function_syntax'), ',') . "<CR>"
+nnoremap <silent><expr> <Plug>movealongFunctionBackward ":Movealong k^ -defaults -syntax " . join(movealong#util#setting('function_syntax'), ',') . "<CR>"
 
 nnoremap <silent><expr> <Plug>movealongIndentForward    ":Movealong j^ -expression indent('.')==" . indent('.') . "<CR>"
 nnoremap <silent><expr> <Plug>movealongIndentBackward   ":Movealong k^ -expression indent('.')==" . indent('.') . "<CR>"
@@ -93,6 +92,6 @@ nnoremap <silent><expr> <Plug>movealongIndentBackward   ":Movealong k^ -expressi
 " map default keys
 if g:movealong_default_keys
   for [plug, key] in items(g:movealong_default_maps)
-    execute "nmap <silent> " . key . " <Plug>movealong" . plug
+    execute "nmap " . key . " <Plug>movealong" . plug
   endfor
 endif

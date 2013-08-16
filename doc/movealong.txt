@@ -122,10 +122,25 @@ COMMANDS                                        *movealong-commands*
 
         You can pass the following options:
 
-        -syntax {syntax}
-            Specify one ore more syntax groups to match, separated
-            by commas.
+        -defaults
+            Enable all default skips, sets the following options:
 
+              -skip-blank
+              -skip-punct
+              -skip-noise
+              -skip-syntax |g:movealong_skip_syntax|
+              -skip-words  |g:movealong_skip_words|
+
+        -noise
+            Skip all default noise, sets the following options:
+
+              -defaults
+              -inline
+              -no-initial
+              -no-skip-noise
+
+        -syntax {syntax}
+            Specify one ore more syntax groups to match, separated by commas.
 
         -expression {expr}
             Specify an |expression| that has to return true.
@@ -133,50 +148,59 @@ COMMANDS                                        *movealong-commands*
         -pattern {pattern}
             Specify a |pattern| to match.
 
-        -inline
+        -(no-)inline
             Use this for |characterwise| motions, in this mode the
             inner |word| under the cursor will be used for matching
             instead of the whole line.
 
-        -initial {bool}
+            Default: {false}
+                     {true} for some common characterwise motions
+
+        -(no-)initial
             Perform initial motion before checking context.
-            Default: 1
 
-        -skip-noise {bool}
-            Run MovealongNoise after a successful motion.
-            Default: 1, or 0 if an expression or pattern was passed
+            Default: {true}
 
-        -skip-blank {bool}
+        -(no-)skip-noise
+            Skip over additional noise after a successful motion.
+
+            Default: {false}
+
+        -(no-)skip-blank
             Skip over any whitespace.
-            Default: 1
 
-        -skip-punct {bool}
+            Default: {false}
+
+        -(no-)skip-punct
             Skip over any punctuation. (see |[:punct:]|)
-            Default: 1
 
-        -skip-syntax {bool}
-            Skip over the specified syntax groups.
+            Default: {false}
+
+        -skip-syntax {string}
+            Skip over the specified syntax groups, separated by commas.
+
             Default: |g:movealong_skip_syntax|
 
-        -skip-words {bool}
-            Skip over the specified words.
+        -skip-words {string}
+            Skip over the specified words, separated by commas.
+
             Default: |g:movealong_skip_words|
 
         -max-motions {number}
             Abort if the motion has been repeated [number] times.
             Default: |g:movealong_max_motions|
 
-        -cross-lines {bool}
+        -(no-)cross-lines
             Continue if a motion changes the current line.
-            Default: 1
+            Default: {true}
 
-        -cross-eof {bool}
+        -(no-)cross-eof
             Continue if a motion wraps around the file boundaries.
-            Default: 0
+            Default: {false}
 
-:MovealongNoise                                 *MovealongNoise*
-        Convenience wrapper to skip only over blank lines, punctuation
-        and syntax noise.
+        -(no-)debug
+            Show debug messages.
+            Default: {false}
 
 :MovealongWhatsWrong                            *MovealongWhatsWrong*
         Show a message explaining why the last command stopped.

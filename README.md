@@ -27,14 +27,14 @@ The following keys will be mapped in normal mode:
 
 ```vim
   " Space - Move to the next useful word
-  noremap <silent> <Space>         :Movealong -inline w<CR>
+  noremap <silent> <Space>         :Movealong w -defaults<CR>
   " Shift-Space Move to the previous useful word
-  noremap <silent> <S-Space>       :Movealong -inline b<CR>
+  noremap <silent> <S-Space>       :Movealong b -defaults<CR>
 
   " Tab - Move to the next useful line
-  noremap <silent> <Tab>           :Movealong j^<CR>
+  noremap <silent> <Tab>           :Movealong j^ -defaults<CR>
   " Shift-Tab - Move to the previous useful line
-  noremap <silent> <S-Tab>         :Movealong k^<CR>
+  noremap <silent> <S-Tab>         :Movealong k^ -defaults<CR>
 
   " <Leader>i - Move to the next line with the same indent
   noremap <silent><expr> <C-Tab>   ":Movealong j^ -expression indent('.')==" . indent('.') . "<CR>"
@@ -43,18 +43,14 @@ The following keys will be mapped in normal mode:
   noremap <silent><expr> <C-S-Tab> ":Movealong k^ -expression indent('.')==" . indent('.') . "<CR>"
 
   " <Leader>f - Move to the next function declaration
-  nnoremap <silent> <Leader>f :MovealongSyntax j^ -syntax vimFuncKey,rubyDefine,pythonFunction,phpFCKeyword<CR>
+  nnoremap <silent> <Leader>f :Movealong j^ -defaults -syntax vimFuncKey,rubyDefine,pythonFunction,phpFCKeyword<CR>
 
   " <Leader>F - Move to the previous function declaration
-  nnoremap <silent> <Leader>F :MovealongSyntax k^ -syntax vimFuncKey,rubyDefine,pythonFunction,phpFCKeyword<CR>
+  nnoremap <silent> <Leader>F :Movealong k^ -defaults -syntax vimFuncKey,rubyDefine,pythonFunction,phpFCKeyword<CR>
 ```
 
 ## Customization
 
-See [`:help movealong`](http://vim-doc.heroku.com/view?https://raw.github.com/toupeira/vim-movealong/master/doc/movealong.txt) for more information.
-
-Note that you can pass any sequence of normal mode commands as motions, so the
-possibilities are endless.  
-Let me know if you come up with any interesting commands!
+See [`:help Movealong`](http://vim-doc.heroku.com/view?https://raw.github.com/toupeira/vim-movealong/master/doc/movealong.txt) for more information.
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/toupeira/vim-movealong/trend.png)](https://bitdeli.com/free "Bitdeli Badge")

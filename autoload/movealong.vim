@@ -3,20 +3,51 @@
 " Version:      1.0
 " License:      Same as Vim itself.  See :help license
 
+let s:debug = 0
+
+" set or show last error message
+function! movealong#whatswrong(...)
+  if a:0 > 0
+    let s:error = a:1
+
+    if s:debug
+      call movealong#whatswrong()
+    endif
+  elseif exists('s:error')
+    echohl WarningMsg
+    let message = "[movealong] " . s:error
+
+    if exists('s:error_pos')
+      let message .= " [pos" . join(s:error_pos[0], '/') . "]"
+      let message .= " [last:"     . join(s:error_pos[1], '/') . "]"
+    endif
+
+    if exists('s:error_syntax')
+      let message .= " [syntax:" . s:error_syntax['name'] . "/" . s:error_syntax['original'] . "]"
+    endif
+
+    echomsg message
+    echohl none
+  else
+    echohl MoreMsg
+    echomsg "[movealong] Nothing to see here, move along!"
+    echohl none
+  endif
+endfunction
+
 "  repeat a motion until the given condition is met
 function! movealong#until(...)
   let options = {
-    \ 'syntax'       : [],
-    \ 'expression'   : '',
-    \ 'pattern'      : '',
-    \ 'inline'       : 0,
-    \ 'initial'      : 1,
-    \ 'cross_lines'  : 1,
-    \ 'cross_eof'    : 0,
-    \ 'skip_blank'   : 1,
-    \ 'skip_punct'   : 1,
-    \ 'skip_words'   : movealong#util#setting('skip_words'),
-    \ 'max_motions'  : movealong#util#setting('max_motions'),
+    \ 'debug'       : 0,
+    \ 'defaults'    : 0,
+    \ 'syntax'      : [],
+    \ 'expression'  : '',
+    \ 'pattern'     : '',
+    \ 'inline'      : 0,
+    \ 'initial'     : 1,
+    \ 'cross_lines' : 1,
+    \ 'cross_eof'   : 0,
+    \ 'max_motions' : movealong#util#setting('max_motions'),
   \ }
 
   " parse arguments
@@ -26,14 +57,30 @@ function! movealong#until(...)
     return
   endif
 
-  " don't skip noise by default if an expression or pattern is given
-  if !has_key(options, 'skip_noise')
-    let options['skip_noise'] = (empty(options['expression']) && empty(options['pattern']))
+  let s:debug = options['debug']
+
+  " enable inline mode for simple characterwise motions
+  if match(motion, '\v[wWeEbBfFtThl]') > -1
+    let options['inline'] = 1
   endif
 
-  " don't skip default syntax groups if matching for syntax
-  if !has_key(options, 'skip_syntax')
-    let options['skip_syntax'] = (empty(options['syntax']) ? movealong#util#setting('skip_syntax') : [])
+  if options['defaults']
+    " add default skip settings
+    let options = extend({
+      \ 'skip_blank'  : 1,
+      \ 'skip_punct'  : 1,
+      \ 'skip_noise'  : 1,
+      \ 'skip_syntax' : movealong#util#setting('skip_syntax'),
+      \ 'skip_words'  : movealong#util#setting('skip_words'),
+    \ }, options)
+  else
+    let options = extend({
+      \ 'skip_blank'  : 0,
+      \ 'skip_punct'  : 0,
+      \ 'skip_noise'  : 0,
+      \ 'skip_syntax' : [],
+      \ 'skip_words'  : [],
+    \ }, options)
   endif
 
   " transform syntax groups and skipwords into regexes
@@ -72,14 +119,7 @@ function! movealong#until(...)
       let pos = [ line('.'), col('.') ]
 
       " store position for error messages
-      call movealong#util#whatswrong(pos, last_pos)
-
-      " get current syntax group
-      let syntax = movealong#util#syntax()
-      let s:error_syntax = syntax
-
-      " store syntax for error messages
-      call movealong#util#whatswrong(syntax)
+      let s:error_pos = [ pos, last_pos ]
 
       if !options['cross_lines'] && pos[0] != last_pos[0]
         " stop at beginning or end of line
@@ -113,54 +153,27 @@ function! movealong#until(...)
     let line_text = substitute(getline('.'), '\v^\s*(.*)\s*$', '\1', 'g')
     let match_text = options['inline'] ? word : line_text
 
-    if !empty(options['pattern'])
-      if match(match_text, options['pattern']) > -1
-        call movealong#util#whatswrong("Stopped because word '" . match_text . "' matched the pattern '" . options['pattern'] . "'")
-        break
-      else
-        call movealong#util#whatswrong("Skipped because word '" . match_text . "' didn't match the pattern '" . options['pattern'] . "'")
-        continue
-      endif
-    endif
+    " get current syntax group and store for error messages
+    let syntax = movealong#util#syntax()
+    let s:error_syntax = syntax
 
     if options['skip_blank'] && match(match_text, '[^ \t]') == -1
       " skip blank lines
-      call movealong#util#whatswrong("Skipped blank line")
+      call movealong#whatswrong("Skipped blank line")
       continue
-    elseif options['skip_punct'] && word != line_text && match(match_text, '\v^[[:punct:]]+$') > -1
+    elseif options['skip_punct'] && match(match_text, '\v^[[:punct:]]+$') > -1
       " skip punctuation
-      call movealong#util#whatswrong("Skipped punctuation '" . match_text . "'")
+      call movealong#whatswrong("Skipped punctuation '" . match_text . "'")
       continue
-    endif
-
-    if !empty(options['expression'])
-      if eval(options['expression'])
-        call movealong#util#whatswrong("Stopped because expression returned true")
-        break
-      else
-        call movealong#util#whatswrong("Skipped because expression returned false")
-        continue
-      endif
-    endif
-
-    if !empty(options['syntax'])
-      if movealong#util#match_syntax(syntax, options['syntax'])
-        " stop if syntax matches
-        call movealong#util#whatswrong("Stopped because syntax matched")
-        break
-      else
-        " skip lines that don't match the syntax
-        call movealong#util#whatswrong("Skipped syntax")
-        continue
-      endif
-    endif
-
-    if !empty(options['skip_words']) && match(match_text, options['skip_words']) > -1
-      " skip lines that only consist of an ignored word
-      call movealong#util#whatswrong("Skipped word '" . match_text . "'")
+    elseif !empty(options['skip_words']) && match(match_text, options['skip_words']) > -1
+      " skip specified words
+      call movealong#whatswrong("Skipped word '" . match_text . "'")
       continue
-    elseif !empty(options['skip_syntax']) && movealong#util#match_syntax(syntax, options['skip_syntax'])
-      " skip ignored syntax groups
+    end
+
+    " skip ignored syntax groups
+    if !empty(options['skip_syntax']) && movealong#util#match_syntax(syntax, options['skip_syntax'])
+      " check for overriden words that should not be skipped for this syntax group
       let syntax_overrides = movealong#util#setting('skip_syntax_overrides')
       if has_key(syntax, 'name') && has_key(syntax_overrides, syntax['name'])
         let overrides = syntax_overrides[syntax['name']]
@@ -171,15 +184,55 @@ function! movealong#until(...)
       endif
 
       if !empty(overrides) && match(match_text, overrides) > -1
-        call movealong#util#whatswrong("Stopped because keyword '" . match_text . "' with syntax group " . syntax['name'] . " was overriden")
+        call movealong#whatswrong("Stopped because keyword '" . match_text . "' with syntax group " . syntax['name'] . " was overriden")
         let options['skip_noise'] = 0
         break
       endif
 
       if syntax['name'] == 'Comment' || line_text == word || options['inline']
-        call movealong#util#whatswrong("Skipped ignored syntax")
+        call movealong#whatswrong("Skipped ignored syntax")
         continue
       endif
+    endif
+
+    " check expressions
+    let match = 0
+    let whatswrong = ''
+
+    if !empty(options['expression'])
+      if eval(options['expression'])
+        call movealong#whatswrong("Stopped because expression returned true")
+        let match = 1
+      else
+        let whatswrong = "Skipped because expression returned false"
+      endif
+    endif
+
+    " check patterns
+    if !empty(options['pattern'])
+      if match(match_text, options['pattern']) > -1
+        call movealong#whatswrong("Stopped because word '" . match_text . "' matched the pattern '" . options['pattern'] . "'")
+        let match = 1
+      else
+        let whatswrong = "Skipped because word '" . match_text . "' didn't match the pattern '" . options['pattern'] . "'"
+      endif
+    endif
+
+    " check syntax groups
+    if !empty(options['syntax'])
+      if movealong#util#match_syntax(syntax, options['syntax'])
+        " stop if syntax matches
+        call movealong#whatswrong("Stopped because syntax matched")
+        let match = 1
+      else
+        " skip lines that don't match the syntax
+        let whatswrong = "Skipped syntax"
+      endif
+    endif
+
+    if !match
+      call movealong#whatswrong(whatswrong)
+      continue
     endif
 
     break
@@ -193,6 +246,7 @@ endfunction
 " skip only over blank lines, punctuation and syntax noise
 function! movealong#skip_noise(...)
   let options = {
+    \ 'defaults'    : 1,
     \ 'inline'      : 1,
     \ 'initial'     : 0,
     \ 'skip_noise'  : 0,
