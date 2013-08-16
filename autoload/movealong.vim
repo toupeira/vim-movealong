@@ -104,6 +104,9 @@ function! movealong#until(...)
     if motions > options['max_motions']
       " stop if the maximum number of motions was reached
       call movealong#util#error("Stopped because maximum number of motions '" . options['max_motions'] . "' was reached")
+
+      " reset cursor position
+      normal ``
       return
     endif
 
@@ -123,19 +126,19 @@ function! movealong#until(...)
 
       if !options['cross_lines'] && pos[0] != last_pos[0]
         " stop at beginning or end of line
-        call movealong#util#abort("Stopped because motion '" . motion . "' crossed line")
+        call movealong#whatswrong("Stopped because motion '" . motion . "' crossed line")
         return
       elseif !options['cross_eof'] && ((pos[1] == 1 && last_pos[1] == line('$')) || (pos[1] == line('$') && last_pos[1] == 1))
         " stop at first or last line
-        call movealong#util#abort("Stopped at beginning/end of file")
+        call movealong#whatswrong("Stopped at beginning/end of file")
         return
       elseif pos == last_pos
         " stop if the motion didn't change the cursor position
-        call movealong#util#abort("Stopped because motion '" . motion . "' didn't change cursor position")
+        call movealong#whatswrong("Stopped because motion '" . motion . "' didn't change cursor position")
         return
       elseif [ pos, last_pos ] == last_two_pos
         " stop if the motion doesn't seem to actually move
-        call movealong#util#abort("Stopped because motion '" . motion . "' seems to be stuck")
+        call movealong#whatswrong("Stopped because motion '" . motion . "' seems to be stuck")
         return
       endif
     endif

@@ -13,16 +13,10 @@ function! movealong#util#setting(key)
   endif
 endfunction
 
-" store an error and reset the cursor position
-function! movealong#util#abort(message)
+" show an error message
+function! movealong#util#error(message)
   execute "normal \<Esc>"
   call movealong#whatswrong(a:message)
-  normal ``
-endfunction
-
-" show an error and reset the cursor position
-function! movealong#util#error(message)
-  call movealong#util#abort(a:message)
   echoerr "[movealong] " . a:message
 endfunction
 
