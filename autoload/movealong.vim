@@ -15,11 +15,20 @@ function! movealong#whatswrong(...)
     endif
   elseif exists('s:error')
     echohl WarningMsg
-    let message = "[movealong] " . s:error
+    let message = "[movealong] "
 
-    if exists('s:error_pos')
-      let message .= " [pos" . join(s:error_pos[0], '/') . "]"
-      let message .= " [last:"     . join(s:error_pos[1], '/') . "]"
+    if exists('s:error_pos') && !empty(s:error_pos[0])
+      let message .= "[" . join(s:error_pos[0], '/') . "] "
+    endif
+
+    let message .= s:error
+
+    if exists('s:error_text')
+      let message .= " [text:" . s:error_text . "]"
+    endif
+
+    if exists('s:error_pos') && !empty(s:error_pos[1])
+      let message .= " [last:" . join(s:error_pos[1], '/') . "]"
     endif
 
     if exists('s:error_syntax')
@@ -155,6 +164,7 @@ function! movealong#until(...)
     " get text of current line, strip whitespace
     let line_text = substitute(getline('.'), '\v^\s*(.*)\s*$', '\1', 'g')
     let match_text = options['inline'] ? word : line_text
+    let s:error_text = match_text
 
     " get current syntax group and store for error messages
     let syntax = movealong#util#syntax()
@@ -233,7 +243,7 @@ function! movealong#until(...)
       endif
     endif
 
-    if !match
+    if !match && !empty(whatswrong)
       call movealong#whatswrong(whatswrong)
       continue
     endif
